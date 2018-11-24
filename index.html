@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>photomosaic.js</title>
+    <link rel="stylesheet" href="./styles.css">
+</head>
+
+<body>
+    <div class="block" id="image-div">
+        <img src="./static/image.jpg" id='background' alt="">
+    </div>
+    <div class="block" id="target-div">
+        <div id='target'></div>
+    </div>
+    <div class="block" id="icon-div">
+        <canvas id="icon-canvas"></canvas>
+    </div>
+    <div id = "tooltip">
+        <img id='detailed-image' alt="detailed image">
+    </div>
+    <div id = "selected-div"></div>
+    <script type="text/javascript" src="library/jquery.min.js"></script>
+</body>
+<script src='./library/photomosaic.js'></script>
+<script>
+var viewWidth = $('body').width()
+var viewHeight =  $('body').height()
+var tooltipWidth = viewWidth * 0.3
+var tooltipHeight = viewWidth * 0.3
+var tileSize = 10
+console.log('viewWidth', viewWidth, 'viewHeight', viewHeight)
+var imageHeight = Math.round(viewHeight * 0.8)
+console.log('imageHeight', imageHeight)
+$('#background').width(imageHeight)
+$('#background').height(imageHeight)
+
+$('#icon-canvas').width(imageHeight)
+$('#icon-canvas').height(imageHeight)
+var photomosaic = new PhotoMosaic({
+    image: document.getElementById('background'),
+    targetElement: document.getElementById('target'),
+    width: imageHeight,
+    height: imageHeight,
+    tileWidth: tileSize,
+    tileHeight: tileSize,
+    tileShape: 'rectangle',
+    opacity: 0.3
+})
+
+var canvas = document.getElementById('icon-canvas')
+var iconDivWidth = $('#icon-div').width()
+canvas.width = imageHeight;
+canvas.height = imageHeight;
+var canvasLeft = (viewWidth - imageHeight) / 2
+var canvasTop = (viewHeight - imageHeight) / 2
+
+var context = canvas.getContext('2d')
+context.fillRect(this.posX, this.posY, this.width, this.height)
+context.globalAlpha = 0.3
+
+var countHeight = Math.floor(imageHeight / tileSize)
+var countWidth = Math.floor(imageHeight / tileSize)
+
+var clickingCount = null
+
+var imageUrlArray = ['facebook.png', 'twitter.png']
+var picPath = './static/icons/'
+var picIndexObj = {}
+var tileCount = 0
+for(var iI = 0; iI < countHeight; iI++) {
+    for(var iJ = 0; iJ < countWidth; iJ++) {
+        var picIndex = Math.floor(Math.random() * imageUrlArray.length)
+        picIndexObj[tileCount] = picIndex
+        var fullPicPath = picPath + imageUrlArray[picIndex]
+        drawImage(iI, iJ, fullPicPath)
+        tileCount = tileCount + 1
+    }
+}
+
+canvas.addEventListener("mousedown", clicked, false);
+$('#selected-div').click(function(){
+    hideSelectedRect()
+    hideTooltip()
+    clickingCount = null
+})
+$('#icon-div').click(function() {
+    cancelSelection()
+})
+
+function clicked(e) {
+    e.preventDefault();
+    var x = e.clientX;
+    var y = e.clientY;
+    var xIndex = Math.floor((x - canvasLeft)/ tileSize)
+    var yIndex = Math.floor((y - canvasTop) / tileSize)
+    var tileCount = yIndex * countWidth + xIndex
+    if (tileCount !== clickingCount) {
+        //  如果点击的不是当前选中的image
+        var clickPicIndex = picIndexObj[tileCount]
+        var imageX = xIndex * tileSize + canvasLeft
+        var imageY = yIndex * tileSize + canvasTop
+        showSelectedRect(imageX, imageY)
+        showTooltip(imageX, imageY, tileSize, clickPicIndex)
+        clickingCount = tileCount
+    } else {
+        // 如果点击的是当前选中的image
+        cancelSelection()
+    }
+}  
+
+function showTooltip(x, y, tileSize, clickPicIndex) {
+    var speed = 200
+    $('#tooltip').css('left', x)
+    $('#tooltip').css('top', y)
+    $('#tooltip').css('height', tileSize)
+    $('#tooltip').css('width', tileSize)
+    // $('#tooltip').css('background-color', 'rgba(0, 0, 0, 0)')
+    $('#tooltip').css('visibility', 'visible') 
+    $('#tooltip').stop().animate({
+        left: x + tileSize,
+        top: y + tileSize,
+        height: tooltipHeight,
+        width: tooltipWidth
+    }, speed);
+    var imageUrl = imageUrlArray[clickPicIndex]
+    var detailImageUrl = imageUrl.replace('.png', '') 
+    $("#detailed-image").attr("src", picPath + detailImageUrl + '-detail.png');  
+    $("#detailed-image").attr('width', tooltipWidth)
+}
+
+function showSelectedRect(x, y) {
+    $('#selected-div').css('left', x)
+    $('#selected-div').css('top', y)
+    $('#selected-div').css('width', tileSize)
+    $('#selected-div').css('height', tileSize)
+    $('#selected-div').css('visibility', 'visible')    
+}
+
+//  取消用户对于icon的选择
+function cancelSelection() {
+    hideSelectedRect()
+    hideTooltip()
+    clickingCount = null
+}
+
+function hideSelectedRect() {
+    $('#selected-div').css('visibility', 'hidden')  
+}
+
+function hideTooltip() {
+    $('#tooltip').css('visibility', 'hidden') 
+}
+
+function drawImage(iJ, iI, fullPicPath) {
+    var x = iI * tileSize;
+    var y = iJ * tileSize;
+    var width = tileSize;
+    var height = tileSize;
+    var imageObj = new Image();
+    imageObj.onload = function() {
+        context.drawImage(imageObj, x, y, width, height);
+    };
+    imageObj.src = fullPicPath;
+}
+
+
+// //  draw image on the canvas
+// var imageUrlArray = ['facebook.png', 'twitter.png']
+// var imageObjArray = []
+// for (var iI = 0;iI < imageUrlArray.length;iI++) {
+//     var imageObj = new Image()
+//     imageObj.src = './static/icons/' + imageUrlArray[iI]
+//     imageObjArray.push(imageObj)
+// }
+// var canvas = $("#icon-canvas")[0];
+// var ctx = canvas.getContext("2d");
+// //draw a box over the top
+// ctx.drawImage(imageObjArray[0], 100, 100, 40, 40)
+
+</script>
+
+</html>
