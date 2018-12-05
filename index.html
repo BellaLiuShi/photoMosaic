@@ -8,8 +8,11 @@
 </head>
 
 <body>
+    <div id="sentence-div">
+        <p id="question-text">What is real you?</p>
+    </div>
     <div class="block" id="image-div">
-        <img src="./static/image.jpg" id='background' alt="">
+        <img src="./static/image.jpg" id='background' alt="background">
     </div>
     <div class="block" id="target-div">
         <div id='target'></div>
@@ -25,19 +28,26 @@
 </body>
 <script src='./library/photomosaic.js'></script>
 <script>
+$('#question-text').click(function() {
+    console.log('click question text')
+    $('#question-text').css('visibility', 'hidden')
+    $('#sentence-div').css('z-index', 0)
+    $('#target-div').css('visibility', 'visible')
+    $('#icon-div').css('visibility', 'visible')
+})
 var viewWidth = $('body').width()
 var viewHeight =  $('body').height()
 var tooltipWidth = viewWidth * 0.3
 var tooltipHeight = viewWidth * 0.3
-var tileSize = 10
-console.log('viewWidth', viewWidth, 'viewHeight', viewHeight)
+var tileSize = 20
 var imageHeight = Math.round(viewHeight * 0.8)
-console.log('imageHeight', imageHeight)
 $('#background').width(imageHeight)
 $('#background').height(imageHeight)
 
 $('#icon-canvas').width(imageHeight)
 $('#icon-canvas').height(imageHeight)
+
+
 var photomosaic = new PhotoMosaic({
     image: document.getElementById('background'),
     targetElement: document.getElementById('target'),
@@ -46,7 +56,7 @@ var photomosaic = new PhotoMosaic({
     tileWidth: tileSize,
     tileHeight: tileSize,
     tileShape: 'rectangle',
-    opacity: 0.3
+    opacity: 0.2
 })
 
 var canvas = document.getElementById('icon-canvas')
@@ -58,15 +68,17 @@ var canvasTop = (viewHeight - imageHeight) / 2
 
 var context = canvas.getContext('2d')
 context.fillRect(this.posX, this.posY, this.width, this.height)
-context.globalAlpha = 0.3
+context.globalAlpha = 0.2
 
 var countHeight = Math.floor(imageHeight / tileSize)
 var countWidth = Math.floor(imageHeight / tileSize)
 
 var clickingCount = null
 
-var imageUrlArray = ['facebook.png', 'twitter.png']
+var imageUrlArray = ['36Kr.png', 'amazon.png', 'Applemusic.png', 'baidu.png', 'baiduditu.png', 'BBC.png', 'bilibili.png', 'bing.png', 'booking.png', 'busticket.png', 'citymapper.png', 'CNN.png', 'dazhongdianping.png', 'deliveroo.png', 'didi.png', 'douyin.png', 'duckduckgo.png', 'ebay.png', 'eleme.png', 'facebook.png', 'facebookmessanger.png', 'feizhu.png', 'fenghuangxinwen.png', 'flipboard.png', 'gett.png', 'google.png', 'googlemap.png', 'guardian.png', 'hanglvzongheng.png', 'harrods.png', 'huanledoudizhu.png', 'hungrypanda.png', 'huxiu.png', 'Instagram.png', 'iqiyi.png', 'jd.png', 'jinritoutiao.png', 'juediqiusheng.png', 'lovebank.png', 'mangotv.png', 'meituanwaimai.png', 'mirror.png', 'netflix.png', 'ofo.png', 'paypal.png', 'qingting.png', 'qq.png', 'QQmusic.png', 'revolve.png', 'seeticket.png', 'shopbop.png', 'sina.png', 'skype.png', 'snapchat.png', 'souhu.png', 'spotify.png', 'steam.png', 'taobao.png', 'tengxun.png', 'Thetelegraph.png', 'toutiao.png', 'trainline.png', 'tripavisor.png', 'twitter.png', 'uber.png', 'uo.png', 'wangyiyunyinyue.png', 'wangzherongyao.png', 'wechat.png', 'weibo.png', 'whatsapp.png', 'xiami.png', 'xiecheng.png', 'ximalaya.png', 'yahoo.png', 'yelp.png', 'youku.png', 'youtube.png']
 var picPath = './static/icons/'
+var detailedPicPath = './static/details/'
+
 var picIndexObj = {}
 var tileCount = 0
 for(var iI = 0; iI < countHeight; iI++) {
@@ -126,7 +138,7 @@ function showTooltip(x, y, tileSize, clickPicIndex) {
     }, speed);
     var imageUrl = imageUrlArray[clickPicIndex]
     var detailImageUrl = imageUrl.replace('.png', '') 
-    $("#detailed-image").attr("src", picPath + detailImageUrl + '-detail.png');  
+    $("#detailed-image").attr("src", detailedPicPath + detailImageUrl + '-detail.png');  
     $("#detailed-image").attr('width', tooltipWidth)
 }
 
