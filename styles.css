@@ -33,6 +33,7 @@ body {
     vertical-align: middle;
     display: inline-block;
     z-index: 2;
+    background: #000;
 }
 
 #question-text {
